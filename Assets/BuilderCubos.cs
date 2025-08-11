@@ -7,13 +7,16 @@ using UnityEngine;
 public class BuilderCubos : IFigurasInterfaz
 {
     public GameObject prefab; //El cubo desde el edito
-    public float tamanhoMinimo = 1f, tamanhoMaximo = 3f; //Las dimensiones minimas del cubo
-
-    public BuilderCubos(GameObject cuboPrefab, float tamanhoMinimo, float tamanhoMaximo) //Constructor
+    public float tamanhoMinimo = 200f, tamanhoMaximo = 500f; //Las dimensiones minimas del cubo
+    private IColisionConfiguracion configuracionObstaculo;
+    
+    
+    public BuilderCubos(GameObject cuboPrefab, float tamanhoMinimo, float tamanhoMaximo, IColisionConfiguracion configurador) //Constructor
     {
         this.prefab = cuboPrefab;
         this.tamanhoMinimo = tamanhoMinimo;
         this.tamanhoMaximo = tamanhoMaximo;
+        this.configuracionObstaculo = configurador;
     }
     
     public void FigurasSpawn(Vector3 PosicionInicial, Transform parent = null) //Llamado al metodo de la interfaz
@@ -26,7 +29,8 @@ public class BuilderCubos : IFigurasInterfaz
             GameObject nuevoCubo = Object.Instantiate(prefab, parent);
             //Cambiando las dimensiones por los randoms y poniendo las posiciones en el suelo
             nuevoCubo.transform.localScale = new Vector3(anchoCubo, altoCubo, fondoCubo);
-            nuevoCubo.transform.position = new Vector3(PosicionInicial.x, altoCubo / 2f, PosicionInicial.z);
-
+            nuevoCubo.transform.position = new Vector3(PosicionInicial.x, PosicionInicial.y, PosicionInicial.z);
+            
+            configuracionObstaculo.Configurar(nuevoCubo);//Llamo a la interfaz con la figura correspondiente a este script
         }
     }

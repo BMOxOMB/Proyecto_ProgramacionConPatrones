@@ -14,13 +14,15 @@ public class DirectorMapa : MonoBehaviour
     // Método que se ejecuta antes de Start
     void Awake()
     {
+        var configuracionObstaculo = new ColisionObConfig();
         // Crea un builder para las figuras, usando el prefab y el rango de tamaño
-        var builderCubo = new BuilderCubos(prefabCubo, 1f, 3f);
-        var builderCilindro = new BuilderCilindro(prefabCilindro, 1f, 3f);
+        var builderCubo = new BuilderCubos(prefabCubo, 200f, 500f,configuracionObstaculo);
+        var builderCilindro = new BuilderCilindro(prefabCilindro, 150f, 300f,configuracionObstaculo);
         // Registra el builder de cubos en el sistema de generación de figuras
         spawnerFiguras.RegisterBuilder(builderCubo);
         // Registra el builder de cilindros también
         spawnerFiguras.RegisterBuilder(builderCilindro);
+        
     }
 
 }

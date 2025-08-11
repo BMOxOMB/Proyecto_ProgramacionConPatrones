@@ -45,10 +45,19 @@ public class BuilderRecursos
             //Genero las figuras
             Vector3 offset = new Vector3(i * spacing, 0, 0);
             Vector3 spawnPos = centerPosition + offset;
+            Quaternion rotation = Quaternion.Euler(270, 0f, 0f);
+            GameObject instance = GameObject.Instantiate(Prefab, spawnPos, rotation , group.transform);
+            Renderer renderer = instance.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                float objectHeight = renderer.bounds.size.y;
+                instance.transform.position = new Vector3(spawnPos.x, spawnPos.y, spawnPos.z);
+            }
+            else
+            {
+                instance.transform.position = new Vector3(spawnPos.x, 0f, spawnPos.z);
+            }
 
-            GameObject instance = GameObject.Instantiate(Prefab, spawnPos, Quaternion.identity, group.transform);
-            float height = instance.transform.localScale.y;
-            instance.transform.position = new Vector3(spawnPos.x, height / 2f, spawnPos.z);
         }
     }
 }
