@@ -1,58 +1,55 @@
 using UnityEngine;
 using TMPro;
 
+[DisallowMultipleComponent]
 public class UIRecursosTMP : MonoBehaviour
 {
-
-    public TMP_Text textoOro;
-    public TMP_Text textoUnidades;
-    public TMP_Text textoEnemigos;
-    public OleadasManager oleadas;
-    public TMP_Text textoOleada;
-    void Start()
-    {
-        GameManager.Instance.OnEnemigosVivosChange += ActualizarEnemigos;
-        ActualizarEnemigos(GameManager.Instance.EnemigosVivos);
-    }
-
-    void OnDestroy()
-    {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnEnemigosVivosChange -= ActualizarEnemigos;
-        }
-    }
-
-
+    [Header("Refs UI")]
     [SerializeField] private TMP_Text textoOro;
     [SerializeField] private TMP_Text textoUnidades;
     [SerializeField] private TMP_Text textoEnemigos;
-    [SerializeField] private OleadasManager oleadas;
     [SerializeField] private TMP_Text textoOleada;
 
+    [Header("Lógica")]
+    [SerializeField] private OleadasManager oleadas;
+
+    // Propiedades de solo lectura (opcional)
     public TMP_Text TextoOro => textoOro;
     public TMP_Text TextoUnidades => textoUnidades;
     public TMP_Text TextoEnemigos => textoEnemigos;
-    public OleadasManager Oleadas => oleadas;
     public TMP_Text TextoOleada => textoOleada;
+    public OleadasManager Oleadas => oleadas;
 
-    void Update()
+    private void Start()
     {
-        textoOro.text = "Oro: " + GameManager.Instance.oro;
-
-        int cantidadU = UnidadMilitar.unidadesAliadas.Count;
-        textoUnidades.text = "Unidades: " + cantidadU;
-
-        textoOleada.text = "Oleada: " + oleadas.oleadaActual;
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnEnemigosVivosChange += ActualizarEnemigos;
+            ActualizarEnemigos(GameManager.Instance.EnemigosVivos);
+        }
     }
 
-
-    void ActualizarEnemigos(int cantidad)
+    private void OnDestroy()
     {
-        textoEnemigos.text = "Enemigos: " + cantidad;
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnEnemigosVivosChange -= ActualizarEnemigos;
     }
 
-}
+    private void Update()
+    {
+        if (GameManager.Instance != null && textoOro != null)
+            textoOro.text = "Oro: " + GameManager.Instance.oro;
 
-    
+        if (textoUnidades != null)
+            textoUnidades.text = "Unidades: " + UnidadMilitar.unidadesAliadas.Count;
+
+        if (oleadas != null && textoOleada != null)
+            textoOleada.text = "Oleada: " + oleadas.oleadaActual;
+    }
+
+    private void ActualizarEnemigos(int cantidad)
+    {
+        if (textoEnemigos != null)
+            textoEnemigos.text = "Enemigos: " + cantidad;
+    }
 }

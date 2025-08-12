@@ -13,7 +13,7 @@ public class EstadoAtacar : IEstadoUnidadIA
     public EstadoAtacar(UnidadMilitar unidadObjetivo)
     {
         objetivo = unidadObjetivo;
-        basePrincipal = GameObject.FindObjectOfType<BasePrincipal>();
+        basePrincipal = Object.FindFirstObjectByType<BasePrincipal>();
     }
 
     public void Ejecutar(EnemigoIA contexto)
