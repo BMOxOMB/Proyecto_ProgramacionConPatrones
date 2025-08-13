@@ -4,32 +4,15 @@ public class EstadoAtacarAuto : IEstadoUnidadJugador
 {
     public void Ejecutar(UnidadMilitar unidad)
     {
-        // Primero, atacar enemigos cercanos
-        EnemigoIA[] enemigos = GameObject.FindObjectsOfType<EnemigoIA>();
+        Collider[] hits = Physics.OverlapSphere(unidad.transform.position, 4f);
 
-        foreach (var enemigo in enemigos)
+        foreach (var hit in hits)
         {
-            float distancia = Vector3.Distance(unidad.transform.position, enemigo.transform.position);
-
-            if (distancia < 4f)
+            EnemigoIA enemigo = hit.GetComponent<EnemigoIA>();
+            if (enemigo != null)
             {
+                Debug.Log(unidad.tipoUnidad + " ataca automáticamente a " + enemigo.name);
                 enemigo.RecibirDanio(10);
-                Debug.Log(unidad.tipoUnidad + " atacó a un enemigo.");
-                return;
-            }
-        }
-
-        // Si no hay enemigos, buscar recursos
-        RecursoMineral[] recursos = GameObject.FindObjectsOfType<RecursoMineral>();
-
-        foreach (var recurso in recursos)
-        {
-            float distancia = Vector3.Distance(unidad.transform.position, recurso.transform.position);
-
-            if (distancia < 2f)
-            {
-                recurso.RecibirDanio(10);
-                Debug.Log(unidad.tipoUnidad + " recolecta recurso.");
                 return;
             }
         }
