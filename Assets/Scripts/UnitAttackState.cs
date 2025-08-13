@@ -1,75 +1,91 @@
-using System;
-using System.Diagnostics.Contracts;
+using RTSGame.AI;
 using UnityEngine;
 using UnityEngine.AI;
+
 public class UnitAttackState : StateMachineBehaviour
 {
-    NavMeshAgent agent;
-    AttackController attackController;
-    public float stopAttackingDistance = 1.2f;
-    public float attackRate = 2f; // Time between attacks in seconds
-    private float attackTimer; // Timer to track attack rate
+    private NavMeshAgent agent;
+    private AttackController attackController;
+    private Transform currentTarget;
 
-    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    [Header("Combat Settings")]
+    public float stopAttackingDistance = 1.8f;
+    public float attackRate = 2f;
+
+    private float attackTimer;
+
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         agent = animator.GetComponent<NavMeshAgent>();
         attackController = animator.GetComponent<AttackController>();
-        attackController.SetAttackMaterial(); // Set the attack material when entering the state
+        currentTarget = attackController.targetToAttack;
+
+        attackController.SetAttackMaterial();
+        attackTimer = 0f;
+        agent.isStopped = true;
     }
 
-    public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (attackController.targetToAttack != null && animator.transform.GetComponent<UnitMovement>().isCommandedToMove == false)
+        // Check if target is valid
+        if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
         {
-            LookatTarget();
+            ExitAttackState(animator);
+            return;
+        }
 
-            //Keep moving towards the target until close enough to attack
-            agent.SetDestination(attackController.targetToAttack.position);
+        // Check distance to target
+        float distance = Vector3.Distance(animator.transform.position, currentTarget.position);
+        if (distance > stopAttackingDistance)
+        {
+            ExitAttackState(animator, shouldFollow: true);
+            return;
+        }
 
-            if (attackTimer <= 0)
-            {
-                Attack();
-                attackTimer = 1f / attackRate; // Reset the attack timer
-            }
-            else 
-            { 
-                attackTimer -= Time.deltaTime; // Decrease the timer
-            }
-
-                //Should unit still be attacking?
-                float distanceToTarget = Vector3.Distance(animator.transform.position, attackController.targetToAttack.position);
-            if (distanceToTarget > stopAttackingDistance || attackController.targetToAttack==null)
-            {
-                agent.SetDestination(animator.transform.position); // Stop moving when exiting the state
-                animator.SetBool("isAttacking", false);
-            }
+        // Handle attack cooldown
+        if (attackTimer <= 0f)
+        {
+            ExecuteAttack();
+            attackTimer = 1f / attackRate;
+        }
+        else
+        {
+            attackTimer -= Time.deltaTime;
         }
     }
 
-    private void Attack() 
+    private void ExecuteAttack()
     {
-        var damageToInflict = attackController.UnitDamage;
+        if (currentTarget == null) return;
 
-        //Actually attack the target
-        var damageable = attackController.targetToAttack.GetComponent<IDamageable>();
-        if (damageable != null)
+        // Get the Health component directly
+        Health health = currentTarget.GetComponent<Health>();
+        if (health != null)
         {
-            damageable.TakeDamage(damageToInflict);
+            health.TakeDamage(attackController.UnitDamage);
+            Debug.Log($"Dealt {attackController.UnitDamage} damage to {currentTarget.name}. Remaining health: {health.CurrentHP}");
+
+            // Visual feedback
+            if (attackController.hitEffect != null)
+            {
+                Instantiate(attackController.hitEffect, currentTarget.position, Quaternion.identity);
+            }
         }
-
+        else
+        {
+            Debug.LogWarning($"No Health component found on {currentTarget.name}");
+        }
     }
 
-    private void LookatTarget()
+    private void ExitAttackState(Animator animator, bool shouldFollow = false)
     {
-        Vector3 direction = attackController.targetToAttack.position - agent.transform.position;
-        agent.transform.rotation = Quaternion.LookRotation(direction);
-
-        var yRotation = agent.transform.rotation.eulerAngles.y;
-        agent.transform.rotation = Quaternion.Euler(0, yRotation, 0); // Lock rotation to Y-axis
+        animator.SetBool("isAttacking", false);
+        animator.SetBool("isFollowing", shouldFollow);
+        agent.isStopped = false;
     }
 
-    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        
+        agent.isStopped = false;
     }
 }
