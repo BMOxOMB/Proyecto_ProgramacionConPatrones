@@ -2,12 +2,17 @@ using UnityEngine;
 
 public class AttackController : MonoBehaviour
 {
-    public Transform targetToAttack;
-
+    
+    public float attackRange = 1.5f; // Attack range variable
     public Material idelStateMaterial;
     public Material followStateMaterial;
     public Material attackStateMaterial;
-    public int UnitDamage; 
+    [Header("Combat Settings")]
+    public float unitDamage = 10f;
+    public GameObject hitEffect;
+    [Header("Targeting")]
+    public Transform targetToAttack;
+    public float UnitDamage => unitDamage;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -16,6 +21,7 @@ public class AttackController : MonoBehaviour
             targetToAttack = other.transform;
         }
     }
+
 
     private void OnTriggerExit(Collider other)
     {
@@ -38,18 +44,19 @@ public class AttackController : MonoBehaviour
         GetComponent<Renderer>().material = attackStateMaterial;
     }
 
+
     private void OnDrawGizmos()
     {
-        //Follow distance / Area
+        // Follow distance / Area
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 10f*0.2f); // Example radius for follow distance
+        Gizmos.DrawWireSphere(transform.position, 10f * 0.2f);
 
-        //Attack distance / Area
+        // Attack distance / Area
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, 1f); // Example radius for attack distance
+        Gizmos.DrawWireSphere(transform.position, attackRange);
 
-        //Stop Attack distance / Area
+        // Stop Attack distance / Area
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, 1.2f); // Example radius for stop attack distance
+        Gizmos.DrawWireSphere(transform.position, attackRange * 1.2f);
     }
 }
