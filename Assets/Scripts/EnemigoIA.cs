@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemigoIA : MonoBehaviour
+public class EnemigoIA : MonoBehaviour, IDamageable
 {
     public IEstadoUnidadIA estadoActual;
     public Transform[] puntosPatrulla;
@@ -8,6 +8,11 @@ public class EnemigoIA : MonoBehaviour
 
     private int indicePatrulla = 0;
     public int vida = 100;
+
+    public void TakeDamage(int cantidad)
+    {
+        RecibirDanio(cantidad);
+    }
 
     public void RecibirDanio(int cantidad)
     {
@@ -17,6 +22,7 @@ public class EnemigoIA : MonoBehaviour
         if (vida <= 0)
         {
             Debug.Log(name + " ha sido destruido.");
+            GameManager.Instance.UnregisterEnemy();
             Destroy(gameObject);
         }
     }
@@ -43,18 +49,25 @@ public class EnemigoIA : MonoBehaviour
 
     public UnidadMilitar BuscarUnidadCercana()
     {
-        UnidadMilitar[] unidades = FindObjectsOfType<UnidadMilitar>();
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 10f);
+        UnidadMilitar masCercana = null;
+        float minDistancia = Mathf.Infinity;
 
-        foreach (UnidadMilitar unidad in unidades)
+        foreach (Collider col in colliders)
         {
-            float distancia = Vector3.Distance(transform.position, unidad.transform.position);
-            if (distancia < 10f) // rango de detección
+            UnidadMilitar unidad = col.GetComponent<UnidadMilitar>();
+            if (unidad != null)
             {
-                return unidad;
+                float distancia = Vector3.Distance(transform.position, unidad.transform.position);
+                if (distancia < minDistancia)
+                {
+                    minDistancia = distancia;
+                    masCercana = unidad;
+                }
             }
         }
 
-        return null;
+        return masCercana;
     }
 
 

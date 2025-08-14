@@ -9,14 +9,10 @@ public class RecolectorFactory : BuildingFactory
         this.prefab = prefab;
     }
 
+    public override int Cost => 25;
+
     public override GameObject CrearEdificio(Vector3 posicion)
     {
-        int costo = 25;
-        if (GameManager.Instance.GastarOro(costo))
-        {
-            return Object.Instantiate(prefab, posicion, Quaternion.identity);
-        }
-
-        return null;
+        return Object.Instantiate(prefab, posicion, Quaternion.identity);
     }
 }

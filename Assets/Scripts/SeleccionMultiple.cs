@@ -32,7 +32,7 @@ public class SeleccionMultiple : MonoBehaviour
         {
             unidadesSeleccionadas.Clear();
 
-            foreach (UnidadMilitar unidad in FindObjectsOfType<UnidadMilitar>())
+            foreach (UnidadMilitar unidad in UnidadMilitar.unidadesAliadas)
             {
                 Vector3 pantallaPos = Camera.main.WorldToScreenPoint(unidad.transform.position);
                 pantallaPos.y = Screen.height - pantallaPos.y;

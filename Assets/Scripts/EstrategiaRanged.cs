@@ -16,7 +16,7 @@ public class EstrategiaRanged : IEstrategiaCombate
 
             if (distancia < 6f)
             {
-                objetivo.RecibirDanio(danio);
+                objetivo.TakeDamage(danio);
                 Debug.Log("Ataque a distancia lanzado");
                 temporizador = tiempoAtaque;
             }

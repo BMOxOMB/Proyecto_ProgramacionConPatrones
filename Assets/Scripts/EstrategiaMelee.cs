@@ -16,7 +16,7 @@ public class EstrategiaMelee : IEstrategiaCombate
 
             if (distancia < 1.5f)
             {
-                objetivo.RecibirDanio(danio);
+                objetivo.TakeDamage(danio);
                 temporizador = tiempoAtaque;
             }
         }

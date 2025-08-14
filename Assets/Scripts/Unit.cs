@@ -1,8 +1,9 @@
 using System;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+public class Unit : MonoBehaviour, IDamageable
 {
+    public int health = 100;
 
     void Start()
     {
@@ -14,8 +15,13 @@ public class Unit : MonoBehaviour
         UnitSelectionManager.instance.allUnits.Remove(gameObject);
     }
 
-    internal void TakeDamage(int damageToInflict)
+    public void TakeDamage(int damageToInflict)
     {
-        throw new NotImplementedException();
+        health -= damageToInflict;
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 }

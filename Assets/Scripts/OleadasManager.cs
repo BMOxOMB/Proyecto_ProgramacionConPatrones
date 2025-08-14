@@ -39,6 +39,8 @@ public class OleadasManager : MonoBehaviour
             Transform punto = puntosSpawn[Random.Range(0, puntosSpawn.Length)];
             GameObject clon = Instantiate(prefabEnemigo, punto.position, Quaternion.identity);
 
+            GameManager.Instance.RegisterEnemy();
+
             // Configurar IA del enemigo si es necesario
             EnemigoIA ia = clon.GetComponent<EnemigoIA>();
             if (ia != null)

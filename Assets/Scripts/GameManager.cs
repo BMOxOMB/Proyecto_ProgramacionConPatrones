@@ -1,10 +1,15 @@
 using UnityEngine;
+using System;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
     public int oro = 500; // recurso inicial
+
+    private int enemigosVivos = 0;
+    public int EnemigosVivos => enemigosVivos;
+    public event Action<int> OnEnemigosVivosChange;
 
     void Awake()
     {
@@ -35,6 +40,18 @@ public class GameManager : MonoBehaviour
     {
         oro += cantidad;
         Debug.Log("Oro ganado. Total: " + oro);
+    }
+
+    public void RegisterEnemy()
+    {
+        enemigosVivos++;
+        OnEnemigosVivosChange?.Invoke(enemigosVivos);
+    }
+
+    public void UnregisterEnemy()
+    {
+        enemigosVivos = Mathf.Max(0, enemigosVivos - 1);
+        OnEnemigosVivosChange?.Invoke(enemigosVivos);
     }
     
     public void Victoria()

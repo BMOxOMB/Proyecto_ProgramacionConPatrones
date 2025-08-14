@@ -13,7 +13,7 @@ public class EstadoAtacar : IEstadoUnidadIA
     public EstadoAtacar(UnidadMilitar unidadObjetivo)
     {
         objetivo = unidadObjetivo;
-        basePrincipal = GameObject.FindObjectOfType<BasePrincipal>();
+        basePrincipal = Object.FindFirstObjectByType<BasePrincipal>();
     }
 
     public void Ejecutar(EnemigoIA contexto)
@@ -77,28 +77,30 @@ public class EstadoAtacar : IEstadoUnidadIA
         }
         else
         {
-            temporizador -= Time.deltaTime;
-            if (temporizador <= 0f)
-            {
-                objetivo.RecibirDanio(danioPorAtaque);
-                temporizador = tiempoAtaque;
-            }
+            contexto.estrategiaCombate?.Atacar(contexto, objetivo);
         }
     }
 
     private UnidadMilitar BuscarUnidadCercana(EnemigoIA contexto)
     {
-        UnidadMilitar[] unidades = GameObject.FindObjectsOfType<UnidadMilitar>();
+        Collider[] colliders = Physics.OverlapSphere(contexto.transform.position, 8f);
+        UnidadMilitar masCercana = null;
+        float minDistancia = Mathf.Infinity;
 
-        foreach (UnidadMilitar unidad in unidades)
+        foreach (Collider col in colliders)
         {
-            float distancia = Vector3.Distance(contexto.transform.position, unidad.transform.position);
-            if (distancia < 8f)
+            UnidadMilitar unidad = col.GetComponent<UnidadMilitar>();
+            if (unidad != null)
             {
-                return unidad;
+                float distancia = Vector3.Distance(contexto.transform.position, unidad.transform.position);
+                if (distancia < minDistancia)
+                {
+                    minDistancia = distancia;
+                    masCercana = unidad;
+                }
             }
         }
 
-        return null;
+        return masCercana;
     }
 }

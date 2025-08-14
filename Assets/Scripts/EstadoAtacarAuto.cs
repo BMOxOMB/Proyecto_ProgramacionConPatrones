@@ -4,16 +4,15 @@ public class EstadoAtacarAuto : IEstadoUnidadJugador
 {
     public void Ejecutar(UnidadMilitar unidad)
     {
-        EnemigoIA[] enemigos = GameObject.FindObjectsOfType<EnemigoIA>();
+        Collider[] hits = Physics.OverlapSphere(unidad.transform.position, 4f);
 
-        foreach (var enemigo in enemigos)
+        foreach (var hit in hits)
         {
-            float distancia = Vector3.Distance(unidad.transform.position, enemigo.transform.position);
-
-            if (distancia < 4f)
+            EnemigoIA enemigo = hit.GetComponent<EnemigoIA>();
+            if (enemigo != null)
             {
                 Debug.Log(unidad.tipoUnidad + " ataca automáticamente a " + enemigo.name);
-                enemigo.RecibirDanio(10); // si querés, implementamos vida para enemigos también
+                enemigo.RecibirDanio(10);
                 return;
             }
         }

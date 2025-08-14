@@ -6,14 +6,18 @@ public class ControladorUnidades : MonoBehaviour
     public SeleccionMultiple selector;
 
     private GrupoUnidades grupoActual = new GrupoUnidades();
+    private Camera mainCamera;
+
+    void Start()
+    {
+        mainCamera = Camera.main;
+    }
 
     void Update()
     {
         if (Input.GetMouseButtonDown(1)) // clic derecho
         {
-            if (grupoActual == null) return;
-
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
